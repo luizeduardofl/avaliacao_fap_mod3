@@ -112,14 +112,30 @@ while True:
                 comando_sql = f'SELECT saldo_conta FROM contas WHERE id_conta = {numero_conta_destino}'
                 cursor.execute(comando_sql)
                 resultado = cursor.fetchall()
-
                 saldo_conta_destino = resultado[0][0]
-                saldo_conta_origem -= quantia_transferida
-                saldo_conta_destino += quantia_transferida
 
-                comando_sql = f'UPDATE contas SET saldo_conta = {saldo_conta_origem} WHERE id_conta = {numero_conta_origem} '
+                novo_saldo_conta_origem = saldo_conta_origem - quantia_transferida
+                saldo_medio_origem = (saldo_conta_origem + novo_saldo_conta_origem) / 2
+
+                novo_saldo_conta_destino = saldo_conta_destino + quantia_transferida
+                saldo_medio_destino = (saldo_conta_destino + novo_saldo_conta_destino) / 2
+
+                comando_sql = f'UPDATE contas SET saldo_conta = {novo_saldo_conta_origem} WHERE id_conta = {numero_conta_origem} '
                 cursor.execute(comando_sql)
-                comando_sql = f'UPDATE contas SET saldo_conta = {saldo_conta_destino} WHERE id_conta = {numero_conta_destino} '
+
+                data_agora = datetime.datetime.now()
+
+                comando_sql = f'''INSERT INTO movimentacoes (data_movimentacao, tipo_movimentacao, valor, id_conta, saldo_antes, 
+                saldo_depois, saldo_medio) VALUES ("{data_agora}", {3}, {quantia_transferida}, {numero_conta_origem}, {saldo_conta_origem},
+                {novo_saldo_conta_origem}, {saldo_medio_origem})'''
+                cursor.execute(comando_sql) 
+
+                comando_sql = f'UPDATE contas SET saldo_conta = {novo_saldo_conta_destino} WHERE id_conta = {numero_conta_destino} '
+                cursor.execute(comando_sql)
+
+                comando_sql = f'''INSERT INTO movimentacoes (data_movimentacao, tipo_movimentacao, valor, id_conta, saldo_antes, 
+                saldo_depois, saldo_medio) VALUES ("{data_agora}", {3}, {quantia_transferida}, {numero_conta_destino}, {saldo_conta_destino},
+                {novo_saldo_conta_destino}, {saldo_medio_destino})'''
                 cursor.execute(comando_sql)
 
                 conexao.commit()
