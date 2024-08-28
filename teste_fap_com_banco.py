@@ -1,5 +1,6 @@
 import datetime
 import mysql.connector
+
 conexao = mysql.connector.connect(
     host = 'localhost',
     user = 'root',
@@ -8,8 +9,6 @@ conexao = mysql.connector.connect(
     port = '3306'
 )
 cursor = conexao.cursor()
-
-presente = datetime.datetime.now()
 
 print('Seja bem-vindo ao Banco FAP.')
 
@@ -35,8 +34,9 @@ while True:
         comando = int(input())
         if comando == 1:
             nome = input('Digite seu nome: ').title()
+            data_agora = datetime.datetime.now()
 
-            comando_sql = f'INSERT INTO contas (nome_conta, data_criacao, saldo_conta) VALUES ("{nome}", "{presente}", {0})'
+            comando_sql = f'INSERT INTO contas (nome_conta, data_criacao, saldo_conta) VALUES ("{nome}", "{data_agora}", {0})'
             cursor.execute(comando_sql)
             conexao.commit()
 
@@ -52,9 +52,17 @@ while True:
 
             saldo = resultado[0][0]
             novo_saldo = saldo + quantia_depositada
+            saldo_medio = (saldo + novo_saldo) / 2
 
             comando_sql = f'UPDATE contas SET saldo_conta = {novo_saldo} WHERE id_conta = {numero_conta}'
             cursor.execute(comando_sql)
+
+            data_agora = datetime.datetime.now()
+
+            comando_sql = f'''INSERT INTO movimentacoes (data_movimentacao, tipo_movimentacao, valor, id_conta, saldo_antes, 
+            saldo_depois, saldo_medio) VALUES ("{data_agora}", {1}, {quantia_depositada}, {numero_conta}, {saldo}, {novo_saldo}, 
+            {saldo_medio})'''
+            cursor.execute(comando_sql) 
 
             conexao.commit()
 
@@ -71,9 +79,19 @@ while True:
             saldo = resultado[0][0] 
 
             if saldo >= quantia_sacada:
-                saldo -= quantia_sacada
+                novo_saldo = saldo - quantia_sacada
+                saldo_medio = (saldo + novo_saldo) / 2
+
                 comando_sql = f'UPDATE contas SET saldo_conta = {saldo} WHERE id_conta = {numero_conta}'
                 cursor.execute(comando_sql)
+
+                data_agora = datetime.datetime.now()
+
+                comando_sql = f'''INSERT INTO movimentacoes (data_movimentacao, tipo_movimentacao, valor, id_conta, saldo_antes, 
+                saldo_depois, saldo_medio) VALUES ("{data_agora}", {2}, {quantia_sacada}, {numero_conta}, {saldo}, {novo_saldo}, 
+                {saldo_medio})'''
+                cursor.execute(comando_sql) 
+
                 conexao.commit()
                 print('Saque realizado com sucesso. ')
             else:
