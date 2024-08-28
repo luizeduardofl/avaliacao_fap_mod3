@@ -1,6 +1,5 @@
 import datetime
 import mysql.connector
-
 conexao = mysql.connector.connect(
     host = 'localhost',
     user = 'root',
@@ -10,7 +9,7 @@ conexao = mysql.connector.connect(
 )
 cursor = conexao.cursor()
 
-presente = datetime.datetime.now().date()
+presente = datetime.datetime.now()
 
 print('Seja bem-vindo ao Banco FAP.')
 
@@ -29,8 +28,9 @@ while True:
         print('1. Criar conta')
         print('2. Fazer depósito')
         print('3. Fazer saque')
-        print('4. Dados de conta')
-        print('5. Sair')
+        print('4. Fazer transferência')
+        print('5. Consultar dados de conta')
+        print('6. Sair')
 
         comando = int(input())
         if comando == 1:
@@ -43,15 +43,15 @@ while True:
             print('Conta cadastrada com sucesso.')
 
         if comando == 2:
-            numero_conta = int(input('Número da conta: '))
+            numero_conta = int(input('Número da sua conta: '))
             quantia_depositada = int(input('Quantia a ser depositada: '))
 
             comando_sql = f'SELECT saldo_conta FROM contas WHERE id_conta = {numero_conta}'
             cursor.execute(comando_sql)
             resultado = cursor.fetchall()
 
-            saldo_atual = resultado[0][0]
-            novo_saldo = saldo_atual + quantia_depositada
+            saldo = resultado[0][0]
+            novo_saldo = saldo + quantia_depositada
 
             comando_sql = f'UPDATE contas SET saldo_conta = {novo_saldo} WHERE id_conta = {numero_conta}'
             cursor.execute(comando_sql)
@@ -61,32 +61,63 @@ while True:
             print('Depósito realizado com sucesso.') 
 
         if comando == 3:
-            numero_conta = int(input('Número da conta: '))
+            numero_conta = int(input('Número da sua conta: '))
             quantia_sacada = int(input('Quantia a ser sacada: '))
 
             comando_sql = f'SELECT saldo_conta FROM contas WHERE id_conta = {numero_conta}'
             cursor.execute(comando_sql)
             resultado = cursor.fetchall()
 
-            saldo_atual = resultado[0][0] 
+            saldo = resultado[0][0] 
 
-            if saldo_atual >= quantia_sacada:
-                novo_saldo = saldo_atual - quantia_sacada
-                comando_sql = f'UPDATE contas SET saldo_conta = {novo_saldo} WHERE id_conta = {numero_conta}'
+            if saldo >= quantia_sacada:
+                saldo -= quantia_sacada
+                comando_sql = f'UPDATE contas SET saldo_conta = {saldo} WHERE id_conta = {numero_conta}'
                 cursor.execute(comando_sql)
                 conexao.commit()
                 print('Saque realizado com sucesso. ')
             else:
-                print(f'Comando inválido. Saldo insuficiente. Saldo atual: {saldo_atual}')
+                print(f'Comando inválido. Saldo insuficiente. Saldo atual: {saldo}')
 
         if comando == 4:
-            numero_conta = int(input('Número da conta: '))
+            numero_conta_origem = int(input('Número da conta de origem: '))
+            quantia_transferida = int(input('Quantia a ser transferida: '))
+            numero_conta_destino = int(input('Número da conta de destino: '))
+
+            comando_sql = f'SELECT saldo_conta FROM contas WHERE id_conta = {numero_conta_origem}'
+            cursor.execute(comando_sql)
+            resultado = cursor.fetchall()
+
+            saldo_conta_origem = resultado[0][0]
+
+            if saldo_conta_origem >= quantia_transferida:
+                comando_sql = f'SELECT saldo_conta FROM contas WHERE id_conta = {numero_conta_destino}'
+                cursor.execute(comando_sql)
+                resultado = cursor.fetchall()
+
+                saldo_conta_destino = resultado[0][0]
+                saldo_conta_origem -= quantia_transferida
+                saldo_conta_destino += quantia_transferida
+
+                comando_sql = f'UPDATE contas SET saldo_conta = {saldo_conta_origem} WHERE id_conta = {numero_conta_origem} '
+                cursor.execute(comando_sql)
+                comando_sql = f'UPDATE contas SET saldo_conta = {saldo_conta_destino} WHERE id_conta = {numero_conta_destino} '
+                cursor.execute(comando_sql)
+
+                conexao.commit()
+                print('Transferência realizada com sucesso. ')
+                
+            else:
+                print(f'Comando inválido. Saldo insuficiente. Saldo atual: {saldo_conta_origem}')
+
+        if comando == 5:
+            numero_conta = int(input('Número da sua conta: '))
             comando_sql = f'SELECT * FROM contas WHERE id_conta = {numero_conta}'
             cursor.execute(comando_sql)
             resultado = cursor.fetchall()
             print(resultado)
 
-        if comando == 5:
+        if comando == 6:
             cursor.close()
             conexao.close() 
             break
