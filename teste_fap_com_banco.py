@@ -202,7 +202,10 @@ while True:
             comando_sql = f'SELECT * FROM contas'
             cursor.execute(comando_sql)
             resultado = cursor.fetchall()
-            print(resultado)
+            if resultado:
+                print(resultado)
+            else:
+                print('Nenhuma conta cadastrada no sistema.')
     
         if comando == 4:
             cursor.close()

@@ -8,10 +8,14 @@ O sistema foi feito durante a FAP (Formação Acelerada em Programação) da SOF
 
 ## Funcionalidades
 
-- **Criação de Contas Bancárias:** Possibilidade de criar novas contas bancárias com dados de clientes.
+- **Criação de Contas Bancárias:** Possibilita criar novas contas bancárias com dados de clientes.
 - **Depósito e Saque:** Permite a realização de depósitos e saques nas contas.
 - **Transferências:** Transferências entre contas cadastradas no sistema.
 - **Consulta de Usuário:** Verificar o nome do usuário, seu saldo, data de criação da conta e id.
+- **Extrato:** Tabela de movimentações financeiras, explicitando o tipo da movimentação e quem a fez. São divididas em três tipos:
+  - 1 - depósito
+  - 2 - saque
+  - 3 - transferência (tanto de quem a realiza quanto de quem a recebe)
 
 ## Tecnologias Utilizadas
 
