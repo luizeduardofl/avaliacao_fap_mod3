@@ -6,6 +6,10 @@ Este é um sistema bancário simples desenvolvido em Python que utiliza o MySQL 
 
 O sistema foi feito durante a FAP (Formação Acelerada em Programação) da SOFTEX Pernambuco.
 
+## Vídeo explicativo
+
+Vídeo demonstrando o funcionamento do programa: https://youtu.be/fZ0XwFIDywY 
+
 ## Funcionalidades
 
 - **Criação de Contas Bancárias:** Possibilita criar novas contas bancárias com dados de clientes.
